@@ -19,6 +19,7 @@ import com.training.superior.superiortraining.R;
 
 /**
  * Created by joakim on 15-03-18.
+ *
  */
 public class LoginView {
     // UI references.

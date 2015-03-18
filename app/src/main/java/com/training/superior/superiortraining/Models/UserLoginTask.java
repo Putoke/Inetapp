@@ -3,7 +3,15 @@ package com.training.superior.superiortraining.Models;
 import android.os.AsyncTask;
 
 import com.training.superior.superiortraining.Controllers.LoginActivity;
-import com.training.superior.superiortraining.R;
+
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.net.URL;
 
 /**
  * Created by joakim on 15-03-18.
@@ -25,11 +33,29 @@ public class UserLoginTask extends AsyncTask<Void, Void, Boolean> {
 
     @Override
     protected Boolean doInBackground(Void... params) {
-        // TODO: attempt authentication against a network service.
+        boolean success = false;
+        try {
 
+            URL url = new URL("http://u-shell.csc.kth.se:8000/login/" + mEmail + "/" + mPassword);
+            InputStream is = url.openStream();
+            InputStreamReader isr = new InputStreamReader(is);
+            BufferedReader br = new BufferedReader(isr);
+            String readString, jSonString = "";
+            while ( (readString = br.readLine()) != null ) {
+                jSonString += readString;
+            }
+            JSONObject jObject = new JSONObject(jSonString);
+            String status = jObject.getString("status");
+            int code = jObject.getInt("code");
+            if (status.equals("OK") && code == 200) {
+                success = true;
+            }
 
-        // TODO: register the new account here.
-        return true;
+        } catch (IOException|JSONException e) {
+            e.printStackTrace();
+        }
+
+        return success;
     }
 
     @Override
