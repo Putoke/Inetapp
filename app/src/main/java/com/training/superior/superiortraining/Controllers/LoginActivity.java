@@ -3,6 +3,7 @@ package com.training.superior.superiortraining.Controllers;
 import android.app.Activity;
 import android.app.LoaderManager.LoaderCallbacks;
 import android.content.CursorLoader;
+import android.content.Intent;
 import android.content.Loader;
 import android.database.Cursor;
 import android.net.Uri;
@@ -101,6 +102,8 @@ public class LoginActivity extends Activity implements LoaderCallbacks<Cursor> {
         view.showProgress(false, this);
 
         if (success) {
+            Intent intent = new Intent(this, HomeActivity.class);
+            startActivity(intent);
             finish();
         } else {
             view.emailError(getString(R.string.error_incorrect_password));
