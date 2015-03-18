@@ -31,6 +31,7 @@ public class LoginView {
     public LoginView (final LoginActivity ac) {
         // Set up the login form.
         mEmailView = (AutoCompleteTextView) ac.findViewById(R.id.email);
+        mEmailView.setText("mugg@evildr.se");
 
         mPasswordView = (EditText) ac.findViewById(R.id.password);
         mPasswordView.setOnEditorActionListener(new TextView.OnEditorActionListener() {
@@ -43,6 +44,7 @@ public class LoginView {
                 return false;
             }
         });
+        mPasswordView.setText("dasseborg");
 
         Button mEmailSignInButton = (Button) ac.findViewById(R.id.email_sign_in_button);
         mEmailSignInButton.setOnClickListener(new View.OnClickListener() {

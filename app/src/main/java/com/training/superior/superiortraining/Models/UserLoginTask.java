@@ -4,13 +4,23 @@ import android.os.AsyncTask;
 
 import com.training.superior.superiortraining.Controllers.LoginActivity;
 
+import org.apache.http.HttpResponse;
+import org.apache.http.client.HttpClient;
+import org.apache.http.client.methods.HttpPost;
+import org.apache.http.entity.StringEntity;
+import org.apache.http.impl.client.DefaultHttpClient;
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.BufferedReader;
+import java.io.DataInputStream;
+import java.io.DataOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.io.PrintWriter;
+import java.net.HttpURLConnection;
+import java.net.Socket;
 import java.net.URL;
 
 /**
@@ -34,14 +44,22 @@ public class UserLoginTask extends AsyncTask<Void, Void, Boolean> {
     @Override
     protected Boolean doInBackground(Void... params) {
         boolean success = false;
+        HttpClient httpClient = new DefaultHttpClient();
         try {
+            JSONObject sendJson = new JSONObject();
+            sendJson.put("email", mEmail);
+            sendJson.put("password", mPassword);
 
-            URL url = new URL("http://u-shell.csc.kth.se:8000/login/" + mEmail + "/" + mPassword);
-            InputStream is = url.openStream();
-            InputStreamReader isr = new InputStreamReader(is);
-            BufferedReader br = new BufferedReader(isr);
+            HttpPost request = new HttpPost("http://u-shell.csc.kth.se:8000/login");
+            StringEntity paras = new StringEntity(sendJson.toString());
+            request.addHeader("content-type", "application/x-www-form-urlencoded");
+            request.setEntity(paras);
+            HttpResponse response = httpClient.execute(request);
+
+            BufferedReader in = new BufferedReader(new InputStreamReader(response.getEntity().getContent()));
+
             String readString, jSonString = "";
-            while ( (readString = br.readLine()) != null ) {
+            while ( (readString = in.readLine()) != null ) {
                 jSonString += readString;
             }
             JSONObject jObject = new JSONObject(jSonString);
@@ -51,8 +69,11 @@ public class UserLoginTask extends AsyncTask<Void, Void, Boolean> {
                 success = true;
             }
 
+            in.close();
         } catch (IOException|JSONException e) {
             e.printStackTrace();
+        } finally {
+            httpClient.getConnectionManager().shutdown();
         }
 
         return success;
