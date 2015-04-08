@@ -1,27 +1,23 @@
 package com.training.superior.superiortraining.Models;
 
 import android.os.AsyncTask;
+import android.webkit.CookieManager;
 
 import com.training.superior.superiortraining.Controllers.LoginActivity;
 
 import org.apache.http.HttpResponse;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpPost;
+import org.apache.http.cookie.Cookie;
 import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.DefaultHttpClient;
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.BufferedReader;
-import java.io.DataInputStream;
-import java.io.DataOutputStream;
 import java.io.IOException;
-import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.io.PrintWriter;
-import java.net.HttpURLConnection;
-import java.net.Socket;
-import java.net.URL;
+import java.util.List;
 
 /**
  * Created by joakim on 15-03-18.
@@ -73,6 +69,14 @@ public class UserLoginTask extends AsyncTask<Void, Void, Boolean> {
         } catch (IOException|JSONException e) {
             e.printStackTrace();
         } finally {
+            //Save cookies to cookie store.
+            List<Cookie> cookies = ((DefaultHttpClient) httpClient).getCookieStore().getCookies();
+            if(cookies != null) {
+                for(Cookie cookie : cookies) {
+                    String cookieString = cookie.getName() + "=" + cookie.getValue() + "; domain=" + cookie.getDomain();
+                    CookieManager.getInstance().setCookie(cookie.getDomain(), cookieString);
+                }
+            }
             httpClient.getConnectionManager().shutdown();
         }
 
