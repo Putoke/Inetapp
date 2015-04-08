@@ -46,6 +46,7 @@ public class UserLoginTask extends AsyncTask<Void, Void, Boolean> {
             sendJson.put("email", mEmail);
             sendJson.put("password", mPassword);
 
+
             HttpPost request = new HttpPost("http://u-shell.csc.kth.se:8000/login");
             StringEntity paras = new StringEntity(sendJson.toString());
             request.addHeader("content-type", "application/x-www-form-urlencoded");
@@ -53,6 +54,9 @@ public class UserLoginTask extends AsyncTask<Void, Void, Boolean> {
             HttpResponse response = httpClient.execute(request);
 
             BufferedReader in = new BufferedReader(new InputStreamReader(response.getEntity().getContent()));
+
+
+
 
             String readString, jSonString = "";
             while ( (readString = in.readLine()) != null ) {

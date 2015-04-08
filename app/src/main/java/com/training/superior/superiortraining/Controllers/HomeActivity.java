@@ -1,36 +1,33 @@
 package com.training.superior.superiortraining.Controllers;
 
-import java.util.Locale;
+import java.util.concurrent.ExecutionException;
 
 import android.support.v7.app.ActionBarActivity;
 import android.support.v7.app.ActionBar;
-import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
-import android.support.v4.app.FragmentPagerAdapter;
 import android.os.Bundle;
-import android.support.v4.view.ViewPager;
-import android.view.Gravity;
-import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.view.View;
-import android.view.ViewGroup;
-import android.widget.TextView;
 
+import com.training.superior.superiortraining.Models.ScheduleTask;
 import com.training.superior.superiortraining.R;
 import com.training.superior.superiortraining.Views.HomeView;
+
+import org.json.JSONArray;
 
 public class HomeActivity extends ActionBarActivity implements ActionBar.TabListener {
 
     HomeView view;
+    ScheduleTask sTask;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_home2);
+        setContentView(R.layout.activity_home);
+        sTask = new ScheduleTask();
         view = new HomeView(this);
     }
+
 
 
     @Override
@@ -61,6 +58,26 @@ public class HomeActivity extends ActionBarActivity implements ActionBar.TabList
         // the ViewPager.
         if(view != null) {
             view.setCurrentItem(tab.getPosition());
+        }
+
+        switch (tab.getPosition()) {
+            case 0:
+                System.out.println(getString(R.string.title_section1));
+                sTask = new ScheduleTask();
+                sTask.execute();
+                try {
+                    JSONArray jsonArray = sTask.get();
+                    if(view != null)
+                        view.updateScheduleJSON(jsonArray);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                } catch (ExecutionException e) {
+                    e.printStackTrace();
+                }
+            case 1:
+                System.out.println(getString(R.string.title_section2));
+            case 2:
+                System.out.println(getString(R.string.title_section3));
         }
     }
 

@@ -1,20 +1,27 @@
 package com.training.superior.superiortraining.Views;
 
-import android.app.Activity;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.ActionBar;
-import android.support.v7.app.ActionBarActivity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ArrayAdapter;
+import android.widget.Button;
+import android.widget.Spinner;
 
 import com.training.superior.superiortraining.Controllers.HomeActivity;
 import com.training.superior.superiortraining.R;
 
+import org.json.JSONArray;
+import org.json.JSONException;
+
+import java.lang.reflect.Array;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Locale;
 
 /**
@@ -38,7 +45,7 @@ public class HomeView {
      */
     ViewPager mViewPager;
 
-    HomeActivity activity;
+    static HomeActivity activity;
 
     public HomeView(HomeActivity activity) {
         this.activity = activity;
@@ -82,6 +89,14 @@ public class HomeView {
         mViewPager.setCurrentItem(item);
     }
 
+    public void updateScheduleJSON(JSONArray jsonArray) {
+        List<Fragment> frags = activity.getSupportFragmentManager().getFragments();
+        for (Fragment f : frags) {
+            if(f instanceof ScheduleFragment)
+                ((ScheduleFragment) f).updateSpinner(jsonArray);
+        }
+    }
+
     /**
      * A {@link android.support.v4.app.FragmentPagerAdapter} that returns a fragment corresponding to
      * one of the sections/tabs/pages.
@@ -96,6 +111,10 @@ public class HomeView {
         public Fragment getItem(int position) {
             // getItem is called to instantiate the fragment for the given page.
             // Return a PlaceholderFragment (defined as a static inner class below).
+            switch (position) {
+                case 0:
+                    return  ScheduleFragment.newInstance(1, new JSONArray());
+            }
             return PlaceholderFragment.newInstance(position + 1);
         }
 
@@ -148,9 +167,64 @@ public class HomeView {
         @Override
         public View onCreateView(LayoutInflater inflater, ViewGroup container,
                                  Bundle savedInstanceState) {
-            View rootView = inflater.inflate(R.layout.fragment_home2, container, false);
+            View rootView = inflater.inflate(R.layout.fragment_home, container, false);
             return rootView;
         }
+    }
+
+    public static class ScheduleFragment extends Fragment {
+        /**
+         * The fragment argument representing the section number for this
+         * fragment.
+         */
+        private static final String ARG_SECTION_NUMBER = "section_number";
+        private static final String ARG_JSON_ARRAY = "json_array";
+
+        /**
+         * Returns a new instance of this fragment for the given section
+         * number.
+         */
+        public static ScheduleFragment newInstance(int sectionNumber, JSONArray jsonArray) {
+            ScheduleFragment fragment = new ScheduleFragment();
+            Bundle args = new Bundle();
+            args.putInt(ARG_SECTION_NUMBER, sectionNumber);
+            args.putString(ARG_JSON_ARRAY, jsonArray.toString());
+            fragment.setArguments(args);
+            return fragment;
+        }
+
+        public ScheduleFragment() {
+        }
+
+        public void updateSpinner(JSONArray jsonArray) {
+            System.out.println("HEJ: " + jsonArray.toString());
+            Spinner spinner = (Spinner) getView().findViewById(R.id.schedules_spinner);
+
+            ArrayList<String> names = new ArrayList<>();
+
+            for(int i=0; i<jsonArray.length(); i++){
+                try {
+                    names.add(jsonArray.getJSONObject(i).getString("name"));
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+            }
+
+            ArrayAdapter<String> adapter = new ArrayAdapter<String>(activity, R.layout.spinner_layout, names);
+            adapter.setDropDownViewResource(R.layout.spinner_layout);
+            spinner.setAdapter(adapter);
+
+        }
+
+        @Override
+        public View onCreateView(LayoutInflater inflater, ViewGroup container,
+                                 Bundle savedInstanceState) {
+            View rootView = inflater.inflate(R.layout.fragment_schedule, container, false);
+
+            return rootView;
+        }
+
+
     }
 
 }
