@@ -242,19 +242,16 @@ public class HomeView {
             spinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
                 @Override
                 public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-                        final ListView workoutsListView = (ListView) rootView.findViewById(R.id.schedules_listview);
-                        final ArrayList<String> workouts = new ArrayList<String>();
-                        for(int i=0; i<scheduleData.length(); i++){
-                            try {
-                                String selectedItem = spinner.getSelectedItem().toString();
-                                if(scheduleData.getJSONObject(i).getString("name").equals(selectedItem))
-                                    workouts.add(scheduleData.getJSONObject(i).getString("workout") + " (" + scheduleData.getJSONObject(i).getString("day") + ")");
-                            } catch (JSONException e) {
-                                e.printStackTrace();
-                            }
+                    final ArrayList<String> workouts = new ArrayList<String>();
+                    for(int i=0; i<scheduleData.length(); i++){
+                        try {
+                            String selectedItem = spinner.getSelectedItem().toString();
+                            if(scheduleData.getJSONObject(i).getString("name").equals(selectedItem))
+                                workouts.add(scheduleData.getJSONObject(i).getString("workout") + " (" + scheduleData.getJSONObject(i).getString("day") + ")");
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                        }
                     }
-                    ArrayAdapter<String> listAdapter = new ArrayAdapter<String>(activity, R.layout.listview_layout, workouts);
-                    workoutsListView.setAdapter(listAdapter);
                     WorkoutTask workoutTask = new WorkoutTask();
                     workoutTask.execute();
                     try {
@@ -265,10 +262,8 @@ public class HomeView {
                         e.printStackTrace();
                     }
                     HashMap<String, List<String>> children = new HashMap<String, List<String>>();
-                    List<String> headers = new ArrayList<String>();
                     for(String s : workouts) {
-                        children.put(s.split("\\(")[0].trim(), new ArrayList<String>());
-                        headers.add(s.split("\\(")[0].trim());
+                        children.put(s, new ArrayList<String>());
                     }
                     for(int i=0; i<workoutData.length(); i++){
                         try {
@@ -276,6 +271,11 @@ public class HomeView {
                             String exercise = workoutData.getJSONObject(i).getString("exercise");
                             String sets = workoutData.getJSONObject(i).getString("sets");
                             String reps = workoutData.getJSONObject(i).getString("reps");
+                            for(String w : workouts) {
+                                if(workout.equals(w.split("\\(")[0].trim())){
+                                    workout = w;
+                                }
+                            }
                             List<String> child = children.get(workout);
                             child.add(exercise + ", sets: " + sets + ", reps: " + reps);
                         } catch (JSONException e) {
@@ -283,18 +283,8 @@ public class HomeView {
                         }
 
                     }
-
-                    workoutsListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-                        @Override
-                        public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                            String selectedWorkout = workoutsListView.getItemAtPosition(position).toString();
-                            System.out.println(selectedWorkout);
-                        }
-                    });
-
-
                     ExpandableListView explist = (ExpandableListView) rootView.findViewById(R.id.schedules_explist);
-                    explist.setAdapter(new ExpListAdapter(activity, headers, children));
+                    explist.setAdapter(new ExpListAdapter(activity, workouts, children));
 
                 }
 
