@@ -1,6 +1,7 @@
 package com.training.superior.superiortraining.Views;
 
 import android.os.Bundle;
+import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
@@ -9,11 +10,18 @@ import android.support.v7.app.ActionBar;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
+import android.widget.BaseExpandableListAdapter;
 import android.widget.Button;
+import android.widget.ExpandableListAdapter;
+import android.widget.ExpandableListView;
+import android.widget.ListView;
 import android.widget.Spinner;
 
 import com.training.superior.superiortraining.Controllers.HomeActivity;
+import com.training.superior.superiortraining.Models.ScheduleTask;
+import com.training.superior.superiortraining.Models.WorkoutTask;
 import com.training.superior.superiortraining.R;
 
 import org.json.JSONArray;
@@ -23,6 +31,7 @@ import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
+import java.util.concurrent.ExecutionException;
 
 /**
  * Created by joakim on 15-03-18.
@@ -180,6 +189,9 @@ public class HomeView {
         private static final String ARG_SECTION_NUMBER = "section_number";
         private static final String ARG_JSON_ARRAY = "json_array";
 
+        JSONArray scheduleData;
+        JSONArray workoutData;
+
         /**
          * Returns a new instance of this fragment for the given section
          * number.
@@ -198,13 +210,15 @@ public class HomeView {
 
         public void updateSpinner(JSONArray jsonArray) {
             System.out.println("HEJ: " + jsonArray.toString());
+            scheduleData = jsonArray;
             Spinner spinner = (Spinner) getView().findViewById(R.id.schedules_spinner);
 
             ArrayList<String> names = new ArrayList<>();
 
             for(int i=0; i<jsonArray.length(); i++){
                 try {
-                    names.add(jsonArray.getJSONObject(i).getString("name"));
+                    if(!names.contains(jsonArray.getJSONObject(i).getString("name")))
+                        names.add(jsonArray.getJSONObject(i).getString("name"));
                 } catch (JSONException e) {
                     e.printStackTrace();
                 }
@@ -219,12 +233,86 @@ public class HomeView {
         @Override
         public View onCreateView(LayoutInflater inflater, ViewGroup container,
                                  Bundle savedInstanceState) {
-            View rootView = inflater.inflate(R.layout.fragment_schedule, container, false);
+            final View rootView = inflater.inflate(R.layout.fragment_schedule, container, false);
+            final Spinner spinner = (Spinner) rootView.findViewById(R.id.schedules_spinner);
+            spinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+                @Override
+                public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                        final ListView workoutsListView = (ListView) rootView.findViewById(R.id.schedules_listview);
+                        final ArrayList<String> workouts = new ArrayList<String>();
+                        for(int i=0; i<scheduleData.length(); i++){
+                            try {
+                                String selectedItem = spinner.getSelectedItem().toString();
+                                if(scheduleData.getJSONObject(i).getString("name").equals(selectedItem))
+                                    workouts.add(scheduleData.getJSONObject(i).getString("workout") + " (" + scheduleData.getJSONObject(i).getString("day") + ")");
+                            } catch (JSONException e) {
+                                e.printStackTrace();
+                            }
+                    }
+                    ArrayAdapter<String> listAdapter = new ArrayAdapter<String>(activity, R.layout.listview_layout, workouts);
+                    workoutsListView.setAdapter(listAdapter);
+                    WorkoutTask workoutTask = new WorkoutTask();
+                    workoutTask.execute();
+                    try {
+                        workoutData = workoutTask.get();
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    } catch (ExecutionException e) {
+                        e.printStackTrace();
+                    }
+
+                    workoutsListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+                        @Override
+                        public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                            String selectedWorkout = workoutsListView.getItemAtPosition(position).toString();
+                            System.out.println(selectedWorkout);
+                            for(int i=0; i<workoutData.length(); i++){
+                                try {
+                                    String workout = workoutData.getJSONObject(i).getString("name");
+                                    if(workout.equals(selectedWorkout.split("\\(")[0].trim())){
+                                        String exercise = workoutData.getJSONObject(i).getString("exercise");
+                                        String sets = workoutData.getJSONObject(i).getString("sets");
+                                        String reps = workoutData.getJSONObject(i).getString("reps");
+                                        System.out.println(exercise + ", " + sets + ", " + reps);
+                                    }
+                                } catch (JSONException e) {
+                                    e.printStackTrace();
+                                }
+
+                            }
+                        }
+                    });
+
+
+                    ExpandableListView explist = (ExpandableListView) rootView.findViewById(R.id.schedules_explist);
+
+                  
+                }
+
+                @Override
+                public void onNothingSelected(AdapterView<?> parent) {
+
+                }
+            });
 
             return rootView;
         }
 
+        @Override
+        public void onActivityCreated(@Nullable Bundle savedInstanceState) {
+            super.onActivityCreated(savedInstanceState);
+            ScheduleTask sTask = new ScheduleTask();
+            sTask.execute();
+            try {
+                JSONArray jsonArray = sTask.get();
+                updateSpinner(jsonArray);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            } catch (ExecutionException e) {
+                e.printStackTrace();
+            }
 
+        }
     }
 
 }

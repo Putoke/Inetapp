@@ -9,4 +9,16 @@
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"/>
 
+    <ListView
+        android:id="@+id/schedules_listview"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content" />
+
+    <ExpandableListView
+        android:id="@+id/schedules_explist"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content" />
+
+
+
 </LinearLayout>
