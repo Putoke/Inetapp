@@ -274,10 +274,10 @@ public class HomeView {
                             for(String w : workouts) {
                                 if(workout.equals(w.split("\\(")[0].trim())){
                                     workout = w;
+                                    List<String> child = children.get(workout);
+                                    child.add(exercise + ", sets: " + sets + ", reps: " + reps);
                                 }
                             }
-                            List<String> child = children.get(workout);
-                            child.add(exercise + ", sets: " + sets + ", reps: " + reps);
                         } catch (JSONException e) {
                             e.printStackTrace();
                         }
