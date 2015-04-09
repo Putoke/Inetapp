@@ -1,5 +1,6 @@
 package com.training.superior.superiortraining.Views;
 
+import android.database.DataSetObserver;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
@@ -17,18 +18,21 @@ import android.widget.Button;
 import android.widget.ExpandableListAdapter;
 import android.widget.ExpandableListView;
 import android.widget.ListView;
+import android.widget.SimpleExpandableListAdapter;
 import android.widget.Spinner;
 
 import com.training.superior.superiortraining.Controllers.HomeActivity;
 import com.training.superior.superiortraining.Models.ScheduleTask;
 import com.training.superior.superiortraining.Models.WorkoutTask;
 import com.training.superior.superiortraining.R;
+import com.training.superior.superiortraining.Views.adapters.ExpListAdapter;
 
 import org.json.JSONArray;
 import org.json.JSONException;
 
 import java.lang.reflect.Array;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.concurrent.ExecutionException;
@@ -260,33 +264,38 @@ public class HomeView {
                     } catch (ExecutionException e) {
                         e.printStackTrace();
                     }
+                    HashMap<String, List<String>> children = new HashMap<String, List<String>>();
+                    List<String> headers = new ArrayList<String>();
+                    for(String s : workouts) {
+                        children.put(s.split("\\(")[0].trim(), new ArrayList<String>());
+                        headers.add(s.split("\\(")[0].trim());
+                    }
+                    for(int i=0; i<workoutData.length(); i++){
+                        try {
+                            String workout = workoutData.getJSONObject(i).getString("name");
+                            String exercise = workoutData.getJSONObject(i).getString("exercise");
+                            String sets = workoutData.getJSONObject(i).getString("sets");
+                            String reps = workoutData.getJSONObject(i).getString("reps");
+                            List<String> child = children.get(workout);
+                            child.add(exercise + ", sets: " + sets + ", reps: " + reps);
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                        }
+
+                    }
 
                     workoutsListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
                         @Override
                         public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                             String selectedWorkout = workoutsListView.getItemAtPosition(position).toString();
                             System.out.println(selectedWorkout);
-                            for(int i=0; i<workoutData.length(); i++){
-                                try {
-                                    String workout = workoutData.getJSONObject(i).getString("name");
-                                    if(workout.equals(selectedWorkout.split("\\(")[0].trim())){
-                                        String exercise = workoutData.getJSONObject(i).getString("exercise");
-                                        String sets = workoutData.getJSONObject(i).getString("sets");
-                                        String reps = workoutData.getJSONObject(i).getString("reps");
-                                        System.out.println(exercise + ", " + sets + ", " + reps);
-                                    }
-                                } catch (JSONException e) {
-                                    e.printStackTrace();
-                                }
-
-                            }
                         }
                     });
 
 
                     ExpandableListView explist = (ExpandableListView) rootView.findViewById(R.id.schedules_explist);
+                    explist.setAdapter(new ExpListAdapter(activity, headers, children));
 
-                  
                 }
 
                 @Override
