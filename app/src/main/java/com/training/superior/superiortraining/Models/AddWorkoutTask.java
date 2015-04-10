@@ -18,13 +18,15 @@ import java.io.InputStreamReader;
 /**
  * Created by joakim on 4/10/15.
  */
-public class AddExerciseTask extends AsyncTask<Void, Void, Boolean> {
+public class AddWorkoutTask extends AsyncTask<Void, Void, Boolean>{
 
-    String name, muscleGroup;
+    private String name, exercise, sets, reps;
 
-    public AddExerciseTask(String name, String muscleGroup) {
+    public AddWorkoutTask(String name, String exercise, String sets, String reps) {
         this.name = name;
-        this.muscleGroup = muscleGroup;
+        this.exercise = exercise;
+        this.sets = sets;
+        this.reps = reps;
     }
 
     @Override
@@ -48,12 +50,14 @@ public class AddExerciseTask extends AsyncTask<Void, Void, Boolean> {
         JSONObject sendJson = new JSONObject();
         try {
             sendJson.put("Name", name);
-            sendJson.put("Musclegroup", muscleGroup);
+            sendJson.put("Exercise", exercise);
+            sendJson.put("Sets", sets);
+            sendJson.put("Reps", reps);
         } catch (JSONException e) {
             e.printStackTrace();
         }
         try {
-            HttpPost request = new HttpPost("http://u-shell.csc.kth.se:8000/exercises/add");
+            HttpPost request = new HttpPost("http://u-shell.csc.kth.se:8000/workouts/add");
 
             request.addHeader("Cookie", sessionCookie);
             StringEntity paras = new StringEntity(sendJson.toString());

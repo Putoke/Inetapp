@@ -1,5 +1,7 @@
 package com.training.superior.superiortraining.Views;
 
+import android.app.AlertDialog;
+import android.content.DialogInterface;
 import android.database.DataSetObserver;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
@@ -25,6 +27,7 @@ import android.widget.Spinner;
 
 import com.training.superior.superiortraining.Controllers.HomeActivity;
 import com.training.superior.superiortraining.Models.AddExerciseTask;
+import com.training.superior.superiortraining.Models.AddWorkoutTask;
 import com.training.superior.superiortraining.Models.RemoveExerciseTask;
 import com.training.superior.superiortraining.Models.ScheduleTask;
 import com.training.superior.superiortraining.Models.WorkoutTask;
@@ -37,6 +40,7 @@ import org.json.JSONObject;
 
 import java.lang.reflect.Array;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
@@ -214,33 +218,111 @@ public class HomeView {
         public AddFragment() {
         }
 
-        @Override
-        public View onCreateView(LayoutInflater inflater, ViewGroup container,
-                                 Bundle savedInstanceState) {
-            View rootView = inflater.inflate(R.layout.add_layout, container, false);
-
-            Spinner spinnerino = new Spinner(activity);
-
+        private void createExerciseView (LinearLayout layout, Spinner spinner) {
             final EditText name = new EditText(activity);
             name.setHint("Name");
             final EditText muscleGroup = new EditText(activity);
-            muscleGroup.setHint("Muscle Group");
+            muscleGroup.setHint("Musclegroup");
+
             Button create = new Button(activity);
             create.setHint("Create exercise");
             create.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    System.out.println("Hejsan svejsan");
-                    RemoveExerciseTask aTask = new RemoveExerciseTask(name.getText().toString());
+                    AddExerciseTask aTask = new AddExerciseTask(name.getText().toString(), muscleGroup.getText().toString());
                     aTask.execute();
+                    name.setText("");
+                    muscleGroup.setText("");
+                    new AlertDialog.Builder(activity)
+                            .setMessage("Exercise added")
+                            .setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener() {
+                                public void onClick(DialogInterface dialog, int which) {
+                                }
+                            })
+                            .setIcon(android.R.drawable.ic_dialog_info)
+                            .show();
                 }
             });
-            LinearLayout layout = (LinearLayout) rootView.findViewById(R.id.addfrag);
 
-            layout.addView(spinnerino);
+            layout.removeAllViews();
+            layout.addView(spinner);
             layout.addView(name);
             layout.addView(muscleGroup);
             layout.addView(create);
+        }
+
+        private void createWorkoutView (LinearLayout layout, Spinner spinner) {
+            final EditText name = new EditText(activity);
+            name.setHint("Name");
+            final EditText exercise = new EditText(activity);
+            exercise.setHint("Exercise");
+            final EditText sets = new EditText(activity);
+            sets.setHint("Sets");
+            final EditText reps = new EditText(activity);
+            reps.setHint("Reps");
+
+            Button create = new Button(activity);
+            create.setHint("Create workout");
+            create.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    AddWorkoutTask aTask = new AddWorkoutTask(name.getText().toString(), exercise.getText().toString(), sets.getText().toString(), reps.getText().toString());
+                    aTask.execute();
+                    name.setText("");
+                    exercise.setText("");
+                    sets.setText("");
+                    reps.setText("");
+                    new AlertDialog.Builder(activity)
+                            .setMessage("Workout added")
+                            .setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener() {
+                                public void onClick(DialogInterface dialog, int which) {
+                                }
+                            })
+                            .setIcon(android.R.drawable.ic_dialog_info)
+                            .show();
+                }
+            });
+
+            layout.removeAllViews();
+            layout.addView(spinner);
+            layout.addView(name);
+            layout.addView(exercise);
+            layout.addView(sets);
+            layout.addView(reps);
+            layout.addView(create);
+        }
+
+        @Override
+        public View onCreateView(LayoutInflater inflater, ViewGroup container,
+                                 Bundle savedInstanceState) {
+            View rootView = inflater.inflate(R.layout.add_layout, container, false);
+
+            final Spinner spinnerino = new Spinner(activity);
+            String[] alternatives = new String[] {"Exercise", "Workout"};
+            ArrayAdapter adapter = new ArrayAdapter(activity, R.layout.spinner_layout, Arrays.asList(alternatives));
+            spinnerino.setAdapter(adapter);
+            final LinearLayout layout = (LinearLayout) rootView.findViewById(R.id.addfrag);
+
+            spinnerino.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+                @Override
+                public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                    String selectedItem = spinnerino.getSelectedItem().toString();
+                    if(selectedItem.equalsIgnoreCase("exercise")){
+                        createExerciseView(layout, spinnerino);
+                    } else if(selectedItem.equalsIgnoreCase("workout")) {
+                        createWorkoutView(layout, spinnerino);
+                    }
+                }
+
+                @Override
+                public void onNothingSelected(AdapterView<?> parent) {
+
+                }
+            });
+
+            layout.addView(spinnerino);
+            createExerciseView(layout, spinnerino);
+
             return rootView;
         }
     }
