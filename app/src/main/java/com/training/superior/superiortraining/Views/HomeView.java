@@ -15,13 +15,17 @@ import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.BaseExpandableListAdapter;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.ExpandableListAdapter;
 import android.widget.ExpandableListView;
+import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.SimpleExpandableListAdapter;
 import android.widget.Spinner;
 
 import com.training.superior.superiortraining.Controllers.HomeActivity;
+import com.training.superior.superiortraining.Models.AddExerciseTask;
+import com.training.superior.superiortraining.Models.RemoveExerciseTask;
 import com.training.superior.superiortraining.Models.ScheduleTask;
 import com.training.superior.superiortraining.Models.WorkoutTask;
 import com.training.superior.superiortraining.R;
@@ -128,6 +132,8 @@ public class HomeView {
             switch (position) {
                 case 0:
                     return  ScheduleFragment.newInstance(1, new JSONArray());
+                case 1:
+                    return AddFragment.newInstance(2);
             }
             return PlaceholderFragment.newInstance(position + 1);
         }
@@ -182,6 +188,59 @@ public class HomeView {
         public View onCreateView(LayoutInflater inflater, ViewGroup container,
                                  Bundle savedInstanceState) {
             View rootView = inflater.inflate(R.layout.fragment_home, container, false);
+            return rootView;
+        }
+    }
+
+    public static class AddFragment extends Fragment {
+        /**
+         * The fragment argument representing the section number for this
+         * fragment.
+         */
+        private static final String ARG_SECTION_NUMBER = "section_number";
+
+        /**
+         * Returns a new instance of this fragment for the given section
+         * number.
+         */
+        public static AddFragment newInstance(int sectionNumber) {
+            AddFragment fragment = new AddFragment();
+            Bundle args = new Bundle();
+            args.putInt(ARG_SECTION_NUMBER, sectionNumber);
+            fragment.setArguments(args);
+            return fragment;
+        }
+
+        public AddFragment() {
+        }
+
+        @Override
+        public View onCreateView(LayoutInflater inflater, ViewGroup container,
+                                 Bundle savedInstanceState) {
+            View rootView = inflater.inflate(R.layout.add_layout, container, false);
+
+            Spinner spinnerino = new Spinner(activity);
+
+            final EditText name = new EditText(activity);
+            name.setHint("Name");
+            final EditText muscleGroup = new EditText(activity);
+            muscleGroup.setHint("Muscle Group");
+            Button create = new Button(activity);
+            create.setHint("Create exercise");
+            create.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    System.out.println("Hejsan svejsan");
+                    RemoveExerciseTask aTask = new RemoveExerciseTask(name.getText().toString());
+                    aTask.execute();
+                }
+            });
+            LinearLayout layout = (LinearLayout) rootView.findViewById(R.id.addfrag);
+
+            layout.addView(spinnerino);
+            layout.addView(name);
+            layout.addView(muscleGroup);
+            layout.addView(create);
             return rootView;
         }
     }
@@ -283,31 +342,19 @@ public class HomeView {
                             JSONObject works = workoutData.getJSONObject(i);
                             String name = works.getString("name");
                             JSONArray exs = works.getJSONArray("exercises");
-                            System.out.println("name = " + name);
 
 
-                            //List<String> child = children.get(name.split("\\(")[0].trim());
-                            List<String> child = children.get(workouts.get(i));
-                            System.out.println("splitname = " + name.split("\\(")[0].trim());
-                            System.out.println(children.toString());
-
-                            for (int j = 0; j < exs.length(); j++) {
-                                JSONObject row = exs.getJSONObject(j);
-                                child.add(row.getString("exercise") + ", sets: " + row.getString("sets") + ", reps: " + row.getString("reps"));
+                            for(String w : workouts) {
+                                if(name.equals(w.split("\\(")[0].trim())){
+                                    name = w;
+                                    List<String> child = children.get(name);
+                                    for (int j = 0; j < exs.length(); j++) {
+                                        JSONObject row = exs.getJSONObject(j);
+                                        child.add(row.getString("exercise") + ", sets: " + row.getString("sets") + ", reps: " + row.getString("reps"));
+                                    }
+                                }
                             }
 
-
-                            /*String workout = workoutData.getJSONObject(i).getString("name");
-                            String exercise = workoutData.getJSONObject(i).getString("exercise");
-                            String sets = workoutData.getJSONObject(i).getString("sets");
-                            String reps = workoutData.getJSONObject(i).getString("reps");
-                            for(String w : workouts) {
-                                if(workout.equals(w.split("\\(")[0].trim())){
-                                    workout = w;
-                                    List<String> child = children.get(workout);
-                                    child.add(exercise + ", sets: " + sets + ", reps: " + reps);
-                                }
-                            }*/
                         } catch (JSONException e) {
                             e.printStackTrace();
                         }

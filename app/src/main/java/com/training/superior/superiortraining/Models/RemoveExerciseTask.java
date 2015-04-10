@@ -5,25 +5,29 @@ import android.webkit.CookieManager;
 
 import org.apache.http.HttpResponse;
 import org.apache.http.client.HttpClient;
-import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
+import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.DefaultHttpClient;
-import org.apache.http.impl.cookie.BasicClientCookie;
 import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.io.BufferedReader;
-import java.io.IOException;
 import java.io.InputStreamReader;
 
 /**
- * Created by joakim on 15-03-18.
- *
+ * Created by joakim on 4/10/15.
  */
-public class ScheduleTask extends AsyncTask<Void, Void, JSONArray> {
+public class RemoveExerciseTask extends AsyncTask<Void, Void, Boolean>{
+
+    private String name;
+
+    public RemoveExerciseTask(String name) {
+        this.name = name;
+    }
 
     @Override
-    protected JSONArray doInBackground(Void... params) {
-
+    protected Boolean doInBackground(Void... params) {
         boolean success = false;
         HttpClient httpClient = new DefaultHttpClient();
 
@@ -40,13 +44,19 @@ public class ScheduleTask extends AsyncTask<Void, Void, JSONArray> {
         }
 
         JSONArray jsonArray = new JSONArray();
+        JSONObject sendJson = new JSONObject();
         try {
-            HttpGet request = new HttpGet("http://u-shell.csc.kth.se:8000/schedules");
-
+            sendJson.put("Name", name);
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+        try {
+            HttpPost request = new HttpPost("http://u-shell.csc.kth.se:8000/exercises/remove");
 
             request.addHeader("Cookie", sessionCookie);
+            StringEntity paras = new StringEntity(sendJson.toString());
             request.addHeader("content-type", "application/x-www-form-urlencoded");
-
+            request.setEntity(paras);
             HttpResponse response = httpClient.execute(request);
 
             BufferedReader in = new BufferedReader(new InputStreamReader(response.getEntity().getContent()));
@@ -55,10 +65,13 @@ public class ScheduleTask extends AsyncTask<Void, Void, JSONArray> {
             while ( (readString = in.readLine()) != null ) {
                 jSonString += readString;
             }
-            jsonArray = new JSONArray(jSonString);
-            System.out.println(jsonArray.toString());
-            System.out.println(request.getURI());
-            success = true;
+            JSONObject jObject = new JSONObject(jSonString);
+            String status = jObject.getString("status");
+            int code = jObject.getInt("code");
+            if (status.equals("OK") && code == 200) {
+                success = true;
+            }
+
             in.close();
         } catch (Exception e) {
             e.printStackTrace();
@@ -66,16 +79,6 @@ public class ScheduleTask extends AsyncTask<Void, Void, JSONArray> {
             httpClient.getConnectionManager().shutdown();
         }
 
-        return jsonArray;
-    }
-
-    @Override
-    protected void onPostExecute(final JSONArray success) {
-        super.onPostExecute(success);
-    }
-
-    @Override
-    protected void onCancelled() {
-
+        return success;
     }
 }
