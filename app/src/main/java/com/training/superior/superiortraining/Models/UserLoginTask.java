@@ -47,7 +47,9 @@ public class UserLoginTask extends AsyncTask<Void, Void, Boolean> {
             sendJson.put("password", mPassword);
 
 
-            HttpPost request = new HttpPost("http://u-shell.csc.kth.se:8000/login");
+            //HttpPost request = new HttpPost("http://u-shell.csc.kth.se:8000/login");
+            HttpPost request = new HttpPost("http://192.168.1.68:8000/login");
+
             StringEntity paras = new StringEntity(sendJson.toString());
             request.addHeader("content-type", "application/x-www-form-urlencoded");
             request.setEntity(paras);

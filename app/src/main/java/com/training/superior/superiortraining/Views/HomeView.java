@@ -29,6 +29,7 @@ import com.training.superior.superiortraining.Views.adapters.ExpListAdapter;
 
 import org.json.JSONArray;
 import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.lang.reflect.Array;
 import java.util.ArrayList;
@@ -246,8 +247,19 @@ public class HomeView {
                     for(int i=0; i<scheduleData.length(); i++){
                         try {
                             String selectedItem = spinner.getSelectedItem().toString();
-                            if(scheduleData.getJSONObject(i).getString("name").equals(selectedItem))
-                                workouts.add(scheduleData.getJSONObject(i).getString("workout") + " (" + scheduleData.getJSONObject(i).getString("day") + ")");
+                            JSONObject sched = scheduleData.getJSONObject(i);
+                            String name = sched.getString("name");
+
+
+                            if(name.equals(selectedItem)) {
+                                JSONArray wos = sched.getJSONArray("schedules");
+                                for (int j = 0; j < wos.length(); j++) {
+                                    JSONObject row = wos.getJSONObject(j);
+                                    workouts.add(row.getString("workout") + " (" + row.getString("day") + ") ");
+                                }
+
+                            }
+
                         } catch (JSONException e) {
                             e.printStackTrace();
                         }
@@ -267,7 +279,25 @@ public class HomeView {
                     }
                     for(int i=0; i<workoutData.length(); i++){
                         try {
-                            String workout = workoutData.getJSONObject(i).getString("name");
+
+                            JSONObject works = workoutData.getJSONObject(i);
+                            String name = works.getString("name");
+                            JSONArray exs = works.getJSONArray("exercises");
+                            System.out.println("name = " + name);
+
+
+                            //List<String> child = children.get(name.split("\\(")[0].trim());
+                            List<String> child = children.get(workouts.get(i));
+                            System.out.println("splitname = " + name.split("\\(")[0].trim());
+                            System.out.println(children.toString());
+
+                            for (int j = 0; j < exs.length(); j++) {
+                                JSONObject row = exs.getJSONObject(j);
+                                child.add(row.getString("exercise") + ", sets: " + row.getString("sets") + ", reps: " + row.getString("reps"));
+                            }
+
+
+                            /*String workout = workoutData.getJSONObject(i).getString("name");
                             String exercise = workoutData.getJSONObject(i).getString("exercise");
                             String sets = workoutData.getJSONObject(i).getString("sets");
                             String reps = workoutData.getJSONObject(i).getString("reps");
@@ -277,7 +307,7 @@ public class HomeView {
                                     List<String> child = children.get(workout);
                                     child.add(exercise + ", sets: " + sets + ", reps: " + reps);
                                 }
-                            }
+                            }*/
                         } catch (JSONException e) {
                             e.printStackTrace();
                         }
