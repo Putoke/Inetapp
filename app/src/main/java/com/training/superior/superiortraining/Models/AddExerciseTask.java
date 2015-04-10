@@ -18,11 +18,11 @@ import java.io.InputStreamReader;
 /**
  * Created by joakim on 4/10/15.
  */
-public class AddWorkoutTask extends AsyncTask<Void, Void, Boolean> {
+public class AddExerciseTask extends AsyncTask<Void, Void, Boolean> {
 
     String name, exercise, sets, reps;
 
-    public AddWorkoutTask(String name, String exercise, String sets, String reps) {
+    public AddExerciseTask(String name, String exercise, String sets, String reps) {
         this.exercise = exercise;
         this.name = name;
         this.sets = sets;
