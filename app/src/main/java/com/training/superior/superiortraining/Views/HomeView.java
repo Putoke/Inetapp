@@ -254,8 +254,41 @@ public class HomeView {
         private void createWorkoutView (LinearLayout layout, Spinner spinner) {
             final EditText name = new EditText(activity);
             name.setHint("Name");
-            final EditText exercise = new EditText(activity);
-            exercise.setHint("Exercise");
+            final Spinner exercise = new Spinner(activity);
+            List<String> exercises = new ArrayList<>();
+
+            WorkoutTask wTask = new WorkoutTask();
+            wTask.execute();
+            try {
+                JSONArray workoutData = wTask.get();
+                for(int i=0; i<workoutData.length(); i++) {
+                    JSONObject works = workoutData.getJSONObject(i);
+                    JSONArray exs = works.getJSONArray("exercises");
+                    for(int j=0; j<exs.length(); j++) {
+                        JSONObject row = exs.getJSONObject(j);
+                        String ex = row.getString("exercise");
+                        boolean contains = false;
+                        for(String s : exercises) {
+                            if(s.equals(ex)) {
+                                contains = true;
+                                break;
+                            }
+                        }
+                        if(!contains)
+                            exercises.add(ex);
+                    }
+                }
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            } catch (ExecutionException e) {
+                e.printStackTrace();
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+            ArrayAdapter<String> adapter = new ArrayAdapter<String>(activity, R.layout.spinner_layout, exercises);
+            exercise.setAdapter(adapter);
+
+
             final EditText sets = new EditText(activity);
             sets.setHint("Sets");
             final EditText reps = new EditText(activity);
@@ -266,10 +299,9 @@ public class HomeView {
             create.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    AddWorkoutTask aTask = new AddWorkoutTask(name.getText().toString(), exercise.getText().toString(), sets.getText().toString(), reps.getText().toString());
+                    AddWorkoutTask aTask = new AddWorkoutTask(name.getText().toString(), exercise.getSelectedItem().toString(), sets.getText().toString(), reps.getText().toString());
                     aTask.execute();
                     name.setText("");
-                    exercise.setText("");
                     sets.setText("");
                     reps.setText("");
                     new AlertDialog.Builder(activity)
