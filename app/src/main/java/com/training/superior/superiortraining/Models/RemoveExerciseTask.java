@@ -32,7 +32,7 @@ public class RemoveExerciseTask extends AsyncTask<Void, Void, Boolean>{
         HttpClient httpClient = new DefaultHttpClient();
 
         //Load saved cookies from cookie store.
-        String[] keyValueSets = CookieManager.getInstance().getCookie("http://u-shell.csc.kth.se:8000").split(";");
+        String[] keyValueSets = CookieManager.getInstance().getCookie(Misc.ServerAddress).split(";");
 
 
         String sessionCookie = "";
@@ -51,7 +51,7 @@ public class RemoveExerciseTask extends AsyncTask<Void, Void, Boolean>{
             e.printStackTrace();
         }
         try {
-            HttpPost request = new HttpPost("http://u-shell.csc.kth.se:8000/exercises/remove");
+            HttpPost request = new HttpPost(Misc.ServerAddress + "/exercises/remove");
 
             request.addHeader("Cookie", sessionCookie);
             StringEntity paras = new StringEntity(sendJson.toString());

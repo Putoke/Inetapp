@@ -28,7 +28,7 @@ public class ScheduleTask extends AsyncTask<Void, Void, JSONArray> {
         HttpClient httpClient = new DefaultHttpClient();
 
         //Load saved cookies from cookie store.
-        String[] keyValueSets = CookieManager.getInstance().getCookie("http://u-shell.csc.kth.se:8000").split(";");
+        String[] keyValueSets = CookieManager.getInstance().getCookie(Misc.ServerAddress).split(";");
 
 
         String sessionCookie = "";
@@ -41,7 +41,7 @@ public class ScheduleTask extends AsyncTask<Void, Void, JSONArray> {
 
         JSONArray jsonArray = new JSONArray();
         try {
-            HttpGet request = new HttpGet("http://u-shell.csc.kth.se:8000/schedules");
+            HttpGet request = new HttpGet(Misc.ServerAddress + "/schedules");
 
 
             request.addHeader("Cookie", sessionCookie);

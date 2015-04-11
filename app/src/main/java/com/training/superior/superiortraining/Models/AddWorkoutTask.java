@@ -35,7 +35,7 @@ public class AddWorkoutTask extends AsyncTask<Void, Void, Boolean>{
         HttpClient httpClient = new DefaultHttpClient();
 
         //Load saved cookies from cookie store.
-        String[] keyValueSets = CookieManager.getInstance().getCookie("http://u-shell.csc.kth.se:8000").split(";");
+        String[] keyValueSets = CookieManager.getInstance().getCookie(Misc.ServerAddress).split(";");
 
 
         String sessionCookie = "";
@@ -57,7 +57,7 @@ public class AddWorkoutTask extends AsyncTask<Void, Void, Boolean>{
             e.printStackTrace();
         }
         try {
-            HttpPost request = new HttpPost("http://u-shell.csc.kth.se:8000/workouts/add");
+            HttpPost request = new HttpPost(Misc.ServerAddress + "/workouts/add");
 
             request.addHeader("Cookie", sessionCookie);
             StringEntity paras = new StringEntity(sendJson.toString());

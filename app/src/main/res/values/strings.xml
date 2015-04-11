@@ -2,6 +2,7 @@
     <string name="app_name">Superior Training</string>
     <string name="title_activity_home">Superior Training</string>
 
+    <string name="server_adress">http://u-shell.csc.kth.se:8000</string>
 
     <string name="title_section1">Schedule</string>
     <string name="title_section2">Create</string>
