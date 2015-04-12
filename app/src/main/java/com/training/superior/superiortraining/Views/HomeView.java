@@ -28,6 +28,7 @@ import android.widget.Spinner;
 import com.training.superior.superiortraining.Controllers.HomeActivity;
 import com.training.superior.superiortraining.Models.AddExerciseTask;
 import com.training.superior.superiortraining.Models.AddWorkoutTask;
+import com.training.superior.superiortraining.Models.ExerciseTask;
 import com.training.superior.superiortraining.Models.RemoveExerciseTask;
 import com.training.superior.superiortraining.Models.ScheduleTask;
 import com.training.superior.superiortraining.Models.WorkoutTask;
@@ -257,26 +258,13 @@ public class HomeView {
             final Spinner exercise = new Spinner(activity);
             List<String> exercises = new ArrayList<>();
 
-            WorkoutTask wTask = new WorkoutTask();
+            ExerciseTask wTask = new ExerciseTask();
             wTask.execute();
             try {
                 JSONArray workoutData = wTask.get();
                 for(int i=0; i<workoutData.length(); i++) {
-                    JSONObject works = workoutData.getJSONObject(i);
-                    JSONArray exs = works.getJSONArray("exercises");
-                    for(int j=0; j<exs.length(); j++) {
-                        JSONObject row = exs.getJSONObject(j);
-                        String ex = row.getString("exercise");
-                        boolean contains = false;
-                        for(String s : exercises) {
-                            if(s.equals(ex)) {
-                                contains = true;
-                                break;
-                            }
-                        }
-                        if(!contains)
-                            exercises.add(ex);
-                    }
+                    JSONObject ex = workoutData.getJSONObject(i);
+                    exercises.add(ex.getString("name"));
                 }
             } catch (InterruptedException e) {
                 e.printStackTrace();
