@@ -34,18 +34,6 @@ public class UserRegisterTask extends AsyncTask<Void, Void, Boolean> {
         boolean success = false;
         HttpClient httpClient = new DefaultHttpClient();
 
-        //Load saved cookies from cookie store.
-        String[] keyValueSets = CookieManager.getInstance().getCookie(Misc.ServerAddress).split(";");
-
-
-        String sessionCookie = "";
-        for(String cookie : keyValueSets)
-        {
-            if(cookie.contains("session"))
-                sessionCookie = cookie;
-            System.out.println(cookie.toString());
-        }
-
         JSONArray jsonArray = new JSONArray();
         JSONObject sendJson = new JSONObject();
         try {
@@ -59,7 +47,7 @@ public class UserRegisterTask extends AsyncTask<Void, Void, Boolean> {
         try {
             HttpPost request = new HttpPost(Misc.ServerAddress + "/register");
 
-            request.addHeader("Cookie", sessionCookie);
+            System.out.println(sendJson);
             StringEntity paras = new StringEntity(sendJson.toString());
             request.addHeader("content-type", "application/x-www-form-urlencoded");
             request.setEntity(paras);

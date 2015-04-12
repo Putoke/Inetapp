@@ -4,7 +4,9 @@ import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
 import android.annotation.TargetApi;
 import android.app.Activity;
+import android.app.AlertDialog;
 import android.app.Dialog;
+import android.content.DialogInterface;
 import android.os.Build;
 import android.view.KeyEvent;
 import android.view.View;
@@ -16,6 +18,7 @@ import android.widget.EditText;
 import android.widget.TextView;
 
 import com.training.superior.superiortraining.Controllers.LoginActivity;
+import com.training.superior.superiortraining.Models.UserRegisterTask;
 import com.training.superior.superiortraining.R;
 
 /**
@@ -68,17 +71,27 @@ public class LoginView {
                 myDialog.setCancelable(false);
                 Button register = (Button) myDialog.findViewById(R.id.register_button);
 
-                String name = ((EditText) myDialog.findViewById(R.id.name)).getText().toString();
-                String lastname = ((EditText) myDialog.findViewById(R.id.lastname)).getText().toString();
-                String email = ((EditText) myDialog.findViewById(R.id.email)).getText().toString();
-                String password = ((EditText) myDialog.findViewById(R.id.password)).getText().toString();
                 myDialog.show();
 
                 register.setOnClickListener(new View.OnClickListener() {
 
                     @Override
                     public void onClick(View v) {
+                        String name = ((EditText) myDialog.findViewById(R.id.name)).getText().toString();
+                        String lastname = ((EditText) myDialog.findViewById(R.id.lastname)).getText().toString();
+                        String email = ((EditText) myDialog.findViewById(R.id.email)).getText().toString();
+                        String password = ((EditText) myDialog.findViewById(R.id.password)).getText().toString();
+                        UserRegisterTask rTask = new UserRegisterTask(name, lastname, email, password);
+                        rTask.execute();
                         myDialog.hide();
+                        new AlertDialog.Builder(ac)
+                                .setMessage("User registered!")
+                                .setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener() {
+                                    public void onClick(DialogInterface dialog, int which) {
+                                    }
+                                })
+                                .setIcon(android.R.drawable.ic_dialog_info)
+                                .show();
                     }
                 });
 
