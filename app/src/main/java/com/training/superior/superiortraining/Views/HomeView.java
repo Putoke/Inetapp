@@ -223,8 +223,28 @@ public class HomeView {
         private void createScheduleView (LinearLayout layout, Spinner spinner) {
             final EditText name = new EditText(activity);
             name.setHint("Name");
-            final EditText workout = new EditText(activity);
-            workout.setHint("Workout");
+            final Spinner workout = new Spinner(activity);
+            List<String> workouts = new ArrayList<>();
+
+            WorkoutTask wTask = new WorkoutTask();
+            wTask.execute();
+            try {
+                JSONArray workoutData = wTask.get();
+                for(int i=0; i<workoutData.length(); i++) {
+                    JSONObject ex = workoutData.getJSONObject(i);
+                    workouts.add(ex.getString("name"));
+                }
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            } catch (ExecutionException e) {
+                e.printStackTrace();
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+            ArrayAdapter<String> adapter = new ArrayAdapter<String>(activity, R.layout.spinner_layout, workouts);
+            workout.setAdapter(adapter);
+            
+            
             final EditText day = new EditText(activity);
             day.setHint("Day");
 
@@ -233,10 +253,10 @@ public class HomeView {
             create.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    AddScheduleTask aTask = new AddScheduleTask(name.getText().toString(), workout.getText().toString(), day.getText().toString());
+                    AddScheduleTask aTask = new AddScheduleTask(name.getText().toString(), workout.getSelectedItem().toString(), day.getText().toString());
                     aTask.execute();
                     name.setText("");
-                    workout.setText("");
+                    day.setText("");
                     new AlertDialog.Builder(activity)
                             .setMessage("Schedule added")
                             .setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener() {
@@ -487,8 +507,7 @@ public class HomeView {
 
                             for(String w : workouts) {
                                 if(name.equals(w.split("\\(")[0].trim())){
-                                    name = w;
-                                    List<String> child = children.get(name);
+                                    List<String> child = children.get(w);
                                     for (int j = 0; j < exs.length(); j++) {
                                         JSONObject row = exs.getJSONObject(j);
                                         child.add(row.getString("exercise") + ", sets: " + row.getString("sets") + ", reps: " + row.getString("reps"));
