@@ -4,6 +4,7 @@ import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
 import android.annotation.TargetApi;
 import android.app.Activity;
+import android.app.Dialog;
 import android.os.Build;
 import android.view.KeyEvent;
 import android.view.View;
@@ -56,6 +57,33 @@ public class LoginView {
 
         mLoginFormView = ac.findViewById(R.id.login_form);
         mProgressView = ac.findViewById(R.id.login_progress);
+
+        Button registerButton = (Button) ac.findViewById(R.id.email_register_button);
+        registerButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+                final Dialog myDialog = new Dialog(ac);
+                myDialog.setContentView(R.layout.register_dialog);
+                myDialog.setCancelable(false);
+                Button register = (Button) myDialog.findViewById(R.id.register_button);
+
+                String name = ((EditText) myDialog.findViewById(R.id.name)).getText().toString();
+                String lastname = ((EditText) myDialog.findViewById(R.id.lastname)).getText().toString();
+                String email = ((EditText) myDialog.findViewById(R.id.email)).getText().toString();
+                String password = ((EditText) myDialog.findViewById(R.id.password)).getText().toString();
+                myDialog.show();
+
+                register.setOnClickListener(new View.OnClickListener() {
+
+                    @Override
+                    public void onClick(View v) {
+                        myDialog.hide();
+                    }
+                });
+
+            }
+        });
     }
 
     /**
