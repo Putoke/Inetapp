@@ -27,6 +27,7 @@ import android.widget.Spinner;
 
 import com.training.superior.superiortraining.Controllers.HomeActivity;
 import com.training.superior.superiortraining.Models.AddExerciseTask;
+import com.training.superior.superiortraining.Models.AddScheduleTask;
 import com.training.superior.superiortraining.Models.AddWorkoutTask;
 import com.training.superior.superiortraining.Models.ExerciseTask;
 import com.training.superior.superiortraining.Models.RemoveExerciseTask;
@@ -219,6 +220,42 @@ public class HomeView {
         public AddFragment() {
         }
 
+        private void createScheduleView (LinearLayout layout, Spinner spinner) {
+            final EditText name = new EditText(activity);
+            name.setHint("Name");
+            final EditText workout = new EditText(activity);
+            workout.setHint("Workout");
+            final EditText day = new EditText(activity);
+            day.setHint("Day");
+
+            Button create = new Button(activity);
+            create.setHint("Create schedule");
+            create.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    AddScheduleTask aTask = new AddScheduleTask(name.getText().toString(), workout.getText().toString(), day.getText().toString());
+                    aTask.execute();
+                    name.setText("");
+                    workout.setText("");
+                    new AlertDialog.Builder(activity)
+                            .setMessage("Schedule added")
+                            .setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener() {
+                                public void onClick(DialogInterface dialog, int which) {
+                                }
+                            })
+                            .setIcon(android.R.drawable.ic_dialog_info)
+                            .show();
+                }
+            });
+
+            layout.removeAllViews();
+            layout.addView(spinner);
+            layout.addView(name);
+            layout.addView(workout);
+            layout.addView(day);
+            layout.addView(create);
+        }
+
         private void createExerciseView (LinearLayout layout, Spinner spinner) {
             final EditText name = new EditText(activity);
             name.setHint("Name");
@@ -318,7 +355,7 @@ public class HomeView {
             View rootView = inflater.inflate(R.layout.add_layout, container, false);
 
             final Spinner spinnerino = new Spinner(activity);
-            String[] alternatives = new String[] {"Exercise", "Workout"};
+            String[] alternatives = new String[] {"Exercise", "Workout", "Schedule"};
             ArrayAdapter adapter = new ArrayAdapter(activity, R.layout.spinner_layout, Arrays.asList(alternatives));
             spinnerino.setAdapter(adapter);
             final LinearLayout layout = (LinearLayout) rootView.findViewById(R.id.addfrag);
@@ -331,6 +368,8 @@ public class HomeView {
                         createExerciseView(layout, spinnerino);
                     } else if(selectedItem.equalsIgnoreCase("workout")) {
                         createWorkoutView(layout, spinnerino);
+                    } else if(selectedItem.equalsIgnoreCase("schedule")) {
+                        createScheduleView(layout, spinnerino);
                     }
                 }
 
