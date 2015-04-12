@@ -30,6 +30,7 @@ import com.training.superior.superiortraining.Models.AddExerciseTask;
 import com.training.superior.superiortraining.Models.AddScheduleTask;
 import com.training.superior.superiortraining.Models.AddWorkoutTask;
 import com.training.superior.superiortraining.Models.ExerciseTask;
+import com.training.superior.superiortraining.Models.GetUserInfoTask;
 import com.training.superior.superiortraining.Models.RemoveExerciseTask;
 import com.training.superior.superiortraining.Models.RemoveScheduleTask;
 import com.training.superior.superiortraining.Models.RemoveWorkoutTask;
@@ -75,6 +76,21 @@ public class HomeView {
 
     public HomeView(HomeActivity activity) {
         this.activity = activity;
+
+        GetUserInfoTask userTask = new GetUserInfoTask();
+        userTask.execute();
+        try {
+            JSONObject jso = userTask.get();
+            String name = jso.getString("name");
+            String lastname = jso.getString("lastname");
+            activity.setTitle(name + " " + lastname);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        } catch (ExecutionException e) {
+            e.printStackTrace();
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
 
         // Set up the action bar.
         final ActionBar actionBar = activity.getSupportActionBar();
@@ -261,8 +277,24 @@ public class HomeView {
         }
 
         private void removeScheduleView(LinearLayout layout, Spinner spinnerino) {
-            final EditText name = new EditText(activity);
-            name.setHint("Name");
+            final Spinner name = new Spinner(activity);
+            ScheduleTask sTask = new ScheduleTask();
+            sTask.execute();
+            final List<String> schedules = new ArrayList<>();
+            try {
+                JSONArray jsonArray = sTask.get();
+                for(int i=0; i<jsonArray.length(); i++) {
+                    schedules.add(jsonArray.getJSONObject(i).getString("name"));
+                }
+                ArrayAdapter<String> adapter = new ArrayAdapter<String>(activity, R.layout.spinner_layout, schedules);
+                name.setAdapter(adapter);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            } catch (ExecutionException e) {
+                e.printStackTrace();
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
 
             Button remove = new Button(activity);
             remove.setHint("Remove schedule");
@@ -270,9 +302,11 @@ public class HomeView {
             remove.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    RemoveScheduleTask rTask = new RemoveScheduleTask(name.getText().toString());
+                    RemoveScheduleTask rTask = new RemoveScheduleTask(name.getSelectedItem().toString());
                     rTask.execute();
-                    name.setText("");
+                    schedules.remove(name.getSelectedItem().toString());
+                    ArrayAdapter<String> adapter = new ArrayAdapter<String>(activity, R.layout.spinner_layout, schedules);
+                    name.setAdapter(adapter);
                     new AlertDialog.Builder(activity)
                             .setMessage("Schedule removed")
                             .setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener() {
@@ -291,8 +325,24 @@ public class HomeView {
         }
 
         private void removeWorkoutView(LinearLayout layout, Spinner spinnerino) {
-            final EditText name = new EditText(activity);
-            name.setHint("Name");
+            final Spinner name = new Spinner(activity);
+            WorkoutTask sTask = new WorkoutTask();
+            sTask.execute();
+            final List<String> workouts = new ArrayList<>();
+            try {
+                JSONArray jsonArray = sTask.get();
+                for(int i=0; i<jsonArray.length(); i++) {
+                    workouts.add(jsonArray.getJSONObject(i).getString("name"));
+                }
+                ArrayAdapter<String> adapter = new ArrayAdapter<String>(activity, R.layout.spinner_layout, workouts);
+                name.setAdapter(adapter);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            } catch (ExecutionException e) {
+                e.printStackTrace();
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
 
             Button remove = new Button(activity);
             remove.setHint("Remove workout");
@@ -300,9 +350,11 @@ public class HomeView {
             remove.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    RemoveWorkoutTask rTask = new RemoveWorkoutTask(name.getText().toString());
+                    RemoveWorkoutTask rTask = new RemoveWorkoutTask(name.getSelectedItem().toString());
                     rTask.execute();
-                    name.setText("");
+                    workouts.remove(name.getSelectedItem().toString());
+                    ArrayAdapter<String> adapter = new ArrayAdapter<String>(activity, R.layout.spinner_layout, workouts);
+                    name.setAdapter(adapter);
                     new AlertDialog.Builder(activity)
                             .setMessage("Workout removed")
                             .setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener() {
@@ -321,8 +373,24 @@ public class HomeView {
         }
 
         private void removeExerciseView(LinearLayout layout, Spinner spinnerino) {
-            final EditText name = new EditText(activity);
-            name.setHint("Name");
+            final Spinner name = new Spinner(activity);
+            ExerciseTask sTask = new ExerciseTask();
+            sTask.execute();
+            final List<String> exercises = new ArrayList<>();
+            try {
+                JSONArray jsonArray = sTask.get();
+                for(int i=0; i<jsonArray.length(); i++) {
+                    exercises.add(jsonArray.getJSONObject(i).getString("name"));
+                }
+                ArrayAdapter<String> adapter = new ArrayAdapter<String>(activity, R.layout.spinner_layout, exercises);
+                name.setAdapter(adapter);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            } catch (ExecutionException e) {
+                e.printStackTrace();
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
 
             Button remove = new Button(activity);
             remove.setHint("Remove exercise");
@@ -330,9 +398,11 @@ public class HomeView {
             remove.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    RemoveExerciseTask rTask = new RemoveExerciseTask(name.getText().toString());
+                    RemoveExerciseTask rTask = new RemoveExerciseTask(name.getSelectedItem().toString());
                     rTask.execute();
-                    name.setText("");
+                    exercises.remove(name.getSelectedItem().toString());
+                    ArrayAdapter<String> adapter = new ArrayAdapter<String>(activity, R.layout.spinner_layout, exercises);
+                    name.setAdapter(adapter);
                     new AlertDialog.Builder(activity)
                             .setMessage("Exercise removed")
                             .setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener() {

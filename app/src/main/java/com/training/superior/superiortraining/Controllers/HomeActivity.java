@@ -1,13 +1,16 @@
 package com.training.superior.superiortraining.Controllers;
 
+import java.net.CookieStore;
 import java.util.concurrent.ExecutionException;
 
+import android.content.Intent;
 import android.support.v7.app.ActionBarActivity;
 import android.support.v7.app.ActionBar;
 import android.support.v4.app.FragmentTransaction;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.webkit.CookieManager;
 
 import com.training.superior.superiortraining.Models.ScheduleTask;
 import com.training.superior.superiortraining.R;
@@ -34,6 +37,17 @@ public class HomeActivity extends ActionBarActivity implements ActionBar.TabList
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
         getMenuInflater().inflate(R.menu.menu_home, menu);
+
+        menu.getItem(0).setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
+            @Override
+            public boolean onMenuItemClick(MenuItem item) {
+                CookieManager.getInstance().removeAllCookies(null);
+                Intent intent = new Intent(HomeActivity.this, LoginActivity.class);
+                startActivity(intent);
+                finish();
+                return true;
+            }
+        });
         return true;
     }
 
