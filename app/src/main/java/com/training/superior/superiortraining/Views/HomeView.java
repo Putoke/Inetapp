@@ -31,6 +31,7 @@ import com.training.superior.superiortraining.Models.AddScheduleTask;
 import com.training.superior.superiortraining.Models.AddWorkoutTask;
 import com.training.superior.superiortraining.Models.ExerciseTask;
 import com.training.superior.superiortraining.Models.RemoveExerciseTask;
+import com.training.superior.superiortraining.Models.RemoveScheduleTask;
 import com.training.superior.superiortraining.Models.RemoveWorkoutTask;
 import com.training.superior.superiortraining.Models.ScheduleTask;
 import com.training.superior.superiortraining.Models.WorkoutTask;
@@ -265,6 +266,23 @@ public class HomeView {
 
             Button remove = new Button(activity);
             remove.setHint("Remove schedule");
+
+            remove.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    RemoveScheduleTask rTask = new RemoveScheduleTask(name.getText().toString());
+                    rTask.execute();
+                    name.setText("");
+                    new AlertDialog.Builder(activity)
+                            .setMessage("Schedule removed")
+                            .setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener() {
+                                public void onClick(DialogInterface dialog, int which) {
+                                }
+                            })
+                            .setIcon(android.R.drawable.ic_dialog_info)
+                            .show();
+                }
+            });
 
             layout.removeAllViews();
             layout.addView(spinnerino);
