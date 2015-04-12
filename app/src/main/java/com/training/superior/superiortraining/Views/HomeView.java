@@ -140,6 +140,8 @@ public class HomeView {
                     return  ScheduleFragment.newInstance(1, new JSONArray());
                 case 1:
                     return AddFragment.newInstance(2);
+                case 2:
+                    return  RemoveFragment.newInstance(3);
             }
             return PlaceholderFragment.newInstance(position + 1);
         }
@@ -195,6 +197,104 @@ public class HomeView {
                                  Bundle savedInstanceState) {
             View rootView = inflater.inflate(R.layout.fragment_home, container, false);
             return rootView;
+        }
+    }
+
+    public static class RemoveFragment extends Fragment {
+        /**
+         * The fragment argument representing the section number for this
+         * fragment.
+         */
+        private static final String ARG_SECTION_NUMBER = "section_number";
+
+        /**
+         * Returns a new instance of this fragment for the given section
+         * number.
+         */
+        public static RemoveFragment newInstance(int sectionNumber) {
+            RemoveFragment fragment = new RemoveFragment();
+            Bundle args = new Bundle();
+            args.putInt(ARG_SECTION_NUMBER, sectionNumber);
+            fragment.setArguments(args);
+            return fragment;
+        }
+
+        public RemoveFragment() {
+        }
+
+        @Override
+        public View onCreateView(LayoutInflater inflater, ViewGroup container,
+                                 Bundle savedInstanceState) {
+            View rootView = inflater.inflate(R.layout.fragment_remove, container, false);
+
+            final Spinner spinnerino = new Spinner(activity);
+            String[] alternatives = new String[] {"Exercise", "Workout", "Schedule"};
+            ArrayAdapter adapter = new ArrayAdapter(activity, R.layout.spinner_layout, Arrays.asList(alternatives));
+            spinnerino.setAdapter(adapter);
+            final LinearLayout layout = (LinearLayout) rootView.findViewById(R.id.removefrag);
+
+            spinnerino.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+                @Override
+                public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                    String selectedItem = spinnerino.getSelectedItem().toString();
+                    if(selectedItem.equalsIgnoreCase("exercise")){
+                        removeExerciseView(layout, spinnerino);
+                    } else if(selectedItem.equalsIgnoreCase("workout")) {
+                        removeWorkoutView(layout, spinnerino);
+                    } else if(selectedItem.equalsIgnoreCase("schedule")) {
+                        removeScheduleView(layout, spinnerino);
+                    }
+                }
+
+                @Override
+                public void onNothingSelected(AdapterView<?> parent) {
+
+                }
+            });
+
+            layout.addView(spinnerino);
+            removeExerciseView(layout, spinnerino);
+
+            return rootView;
+        }
+
+        private void removeScheduleView(LinearLayout layout, Spinner spinnerino) {
+            final EditText name = new EditText(activity);
+            name.setHint("Name");
+
+            Button remove = new Button(activity);
+            remove.setHint("Remove schedule");
+
+            layout.removeAllViews();
+            layout.addView(spinnerino);
+            layout.addView(name);
+            layout.addView(remove);
+        }
+
+        private void removeWorkoutView(LinearLayout layout, Spinner spinnerino) {
+            final EditText name = new EditText(activity);
+            name.setHint("Name");
+
+            Button remove = new Button(activity);
+            remove.setHint("Remove workout");
+
+            layout.removeAllViews();
+            layout.addView(spinnerino);
+            layout.addView(name);
+            layout.addView(remove);
+        }
+
+        private void removeExerciseView(LinearLayout layout, Spinner spinnerino) {
+            final EditText name = new EditText(activity);
+            name.setHint("Name");
+
+            Button remove = new Button(activity);
+            remove.setHint("Remove exercise");
+
+            layout.removeAllViews();
+            layout.addView(spinnerino);
+            layout.addView(name);
+            layout.addView(remove);
         }
     }
 
