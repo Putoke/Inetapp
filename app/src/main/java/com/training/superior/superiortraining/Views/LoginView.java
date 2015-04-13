@@ -48,8 +48,8 @@ public class LoginView {
             }
         });
 
-        mEmailView.setText("Mugg@EvilDR.se");
-        mPasswordView.setText("dasseborg");
+        mEmailView.setText("foo@bar.com");
+        mPasswordView.setText("password");
 
         Button mEmailSignInButton = (Button) ac.findViewById(R.id.email_sign_in_button);
         mEmailSignInButton.setOnClickListener(new View.OnClickListener() {
